@@ -9,12 +9,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mupdf
-PKG_VERSION:=0.9
+PKG_VERSION:=1.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-source.tar.gz
+PKG_BUILD_DIR=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-source
 PKG_SOURCE_URL:=http://mupdf.googlecode.com/files/
-PKG_MD5SUM:=76640ee16a797a27fe49cc0eaa87ce3a
+#PKG_MD5SUM:=76640ee16a797a27fe49cc0eaa87ce3a
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -60,6 +61,7 @@ define Build/InstallDev
 	$(INSTALL_DATA) \
 		$(PKG_BUILD_DIR)/pdf/mupdf.h \
 		$(PKG_BUILD_DIR)/fitz/fitz.h \
+		$(PKG_BUILD_DIR)/fitz/memento.h \
 		$(PKG_BUILD_DIR)/apps/pdfapp.h \
 		$(1)/usr/include/
 

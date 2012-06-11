@@ -1,0 +1,29 @@
+From d863a44d204d63bcbaacb5c6cc922661f2033a5b Mon Sep 17 00:00:00 2001
+From: Cyril Hrubis <metan@ucw.cz>
+Date: Tue, 1 May 2012 12:28:43 +0200
+Subject: [PATCH] fitz/image_jpx.c fix build for newer openjpeg library.
+
+Signed-off-by: Cyril Hrubis <metan@ucw.cz>
+---
+ fitz/image_jpx.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/fitz/image_jpx.c b/fitz/image_jpx.c
+index af5ef26..33cc908 100644
+--- a/fitz/image_jpx.c
++++ b/fitz/image_jpx.c
+@@ -50,8 +50,11 @@ fz_load_jpx(fz_context *ctx, unsigned char *data, int size, fz_colorspace *defcs
+ 	evtmgr.info_handler = fz_opj_info_callback;
+ 
+ 	opj_set_default_decoder_parameters(&params);
++
++#ifdef OPJ_DPARAMETERS_IGNORE_PCLR_CMAP_CDEF_FLAG
+ 	if (indexed)
+ 		params.flags |= OPJ_DPARAMETERS_IGNORE_PCLR_CMAP_CDEF_FLAG;
++#endif
+ 
+ 	info = opj_create_decompress(format);
+ 	opj_set_event_mgr((opj_common_ptr)info, &evtmgr, ctx);
+-- 
+1.7.3.4
+

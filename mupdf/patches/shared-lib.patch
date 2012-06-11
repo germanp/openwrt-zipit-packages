@@ -1,48 +1,45 @@
-diff -Naur mupdf-0.9/Makefile mupdf-0.9-new/Makefile
---- mupdf-0.9/Makefile	2011-09-05 08:55:39.000000000 -0300
-+++ mupdf-0.9-new/Makefile	2012-04-11 20:03:26.000000000 -0300
-@@ -9,7 +9,7 @@
- 
- default: all
- 
--CFLAGS += -Ifitz -Ipdf -Ixps -Iscripts
-+CFLAGS += -Ifitz -Ipdf -Ixps -Iscripts -fpic
- LIBS += -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lm
+diff -Naur mupdf-1.0-source-old/Makefile mupdf-1.0-source/Makefile
+--- mupdf-1.0-source-old/Makefile	2012-06-11 01:05:37.000000000 -0300
++++ mupdf-1.0-source/Makefile	2012-06-11 01:05:53.000000000 -0300
+@@ -12,7 +12,7 @@
+ # Do not specify CFLAGS or LIBS on the make invocation line - specify
+ # XCFLAGS or XLIBS instead. Make ignores any lines in the makefile that
+ # set a variable that was set on the command line.
+-CFLAGS += $(XCFLAGS) -Ifitz -Ipdf -Ixps -Icbz -Iscripts
++CFLAGS += $(XCFLAGS) -Ifitz -Ipdf -Ixps -Icbz -Iscripts -fpic
+ LIBS += $(XLIBS) -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lm
  
  include Makerules
-@@ -33,18 +33,19 @@
- AR_CMD = $(QUIET_AR) $(AR) cru $@ $^
- LINK_CMD = $(QUIET_LINK) $(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
- MKDIR_CMD = $(QUIET_MKDIR) mkdir -p $@
-+MUPDF_LIB_VERSION=0.9
- 
- # --- Rules ---
- 
+@@ -47,9 +47,9 @@
  $(OUT) $(GEN) :
  	$(MKDIR_CMD)
  
 -$(OUT)/%.a :
 -	$(AR_CMD)
+-	$(RANLIB_CMD)
 +$(OUT)/%.so.$(MUPDF_LIB_VERSION) :
 +	$(LINK_CMD) -shared -Wl,-soname,$(notdir $@)
 +	ln -s $(notdir $@) $(subst .$(MUPDF_LIB_VERSION),,$@)
  
  $(OUT)/% : $(OUT)/%.o
  	$(LINK_CMD)
--
- $(OUT)/%.o : fitz/%.c fitz/fitz.h | $(OUT)
- 	$(CC_CMD)
- $(OUT)/%.o : draw/%.c fitz/fitz.h | $(OUT)
-@@ -62,9 +63,9 @@
+@@ -73,7 +73,7 @@
  
- # --- Fitz, MuPDF and MuXPS libraries ---
+ # --- Fitz, MuPDF, MuXPS and MuCBZ library ---
  
 -FITZ_LIB := $(OUT)/libfitz.a
--MUPDF_LIB := $(OUT)/libmupdf.a
--MUXPS_LIB := $(OUT)/libmuxps.a
 +FITZ_LIB := $(OUT)/libfitz.so.$(MUPDF_LIB_VERSION)
-+MUPDF_LIB := $(OUT)/libmupdf.so.$(MUPDF_LIB_VERSION)
-+MUXPS_LIB := $(OUT)/libmuxps.so.$(MUPDF_LIB_VERSION)
  
  FITZ_SRC := $(notdir $(wildcard fitz/*.c draw/*.c))
- MUPDF_SRC := $(notdir $(wildcard pdf/*.c))
+ FITZ_SRC := $(filter-out draw_simple_scale.c, $(FITZ_SRC))
+diff -Naur mupdf-1.0-source-old/Makerules mupdf-1.0-source/Makerules
+--- mupdf-1.0-source-old/Makerules	2012-06-11 01:05:37.000000000 -0300
++++ mupdf-1.0-source/Makerules	2012-06-11 01:05:58.000000000 -0300
+@@ -4,6 +4,7 @@
+ OS := $(OS:MINGW%=MINGW)
+ 
+ CFLAGS += -Wall
++MUPDF_LIB_VERSION=1.0
+ 
+ ifeq "$(build)" "debug"
+ CFLAGS += -pipe -g -DDEBUG
